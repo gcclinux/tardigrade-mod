@@ -263,6 +263,12 @@ Example:
 	tar := tardigrade.Tardigrade{}
 	var received = tar.FirstXFields(2)
 
+	type MyStruct struct {
+		Id   int
+		Key  string
+		Data string
+	}
+
 	bytes := received
 	var data []MyStruct
 	size := len(data)
@@ -289,6 +295,12 @@ Result:
 Example 1: (always true)
 	tar := tardigrade.Tardigrade{}
 	var received = tar.LastXFields(2)
+
+	type MyStruct struct {
+		Id   int
+		Key  string
+		Data string
+	}
 
 	bytes := received
 	var data []MyStruct
@@ -383,6 +395,3 @@ OUTSTANDING:
 ```
 ** Write and share some test functions
 ```
-
-
-
