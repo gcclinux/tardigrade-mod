@@ -1,5 +1,5 @@
 
-## "tardigrade-mod" is the mod version of the is small and simple noSQL database app for small GO apps.
+## this is the mod version of the is small and simple noSQL database app for small GO apps.
 *updated:  Thu 16 Feb 19:13:27 GMT 2023*<br>
 *release:  0.0.4*
 
