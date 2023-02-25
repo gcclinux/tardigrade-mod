@@ -1,5 +1,7 @@
 package tardigrade
 
+// Built Sat 25 Feb 16:15:57 GMT 2023
+
 import (
 	"bufio"
 	"bytes"
@@ -147,7 +149,7 @@ func (tar *Tardigrade) SelectByID(id int, f string) string {
 				CheckError("SelectByID(2)", err)
 
 				if f == "json" {
-					out, _ := json.MarshalIndent(&s, "", "	")
+					out, _ := json.MarshalIndent(&s, "", "  ")
 					result = string(out)
 				} else if f == "value" {
 					result = string(s.Data)
@@ -171,33 +173,38 @@ func (tar *Tardigrade) ModifyField(id int, k, v string) (msg string, status bool
 
 	status = true
 	src := DBFile
-	before := tar.SelectByID(id, "raw")
-	if strings.Contains(before, "Record") && strings.Contains(before, "empty!") {
-		status = false
-		return before, status
-	}
-	var s MyStruct
-	s.Id = id
-	s.Key = k
-	s.Data = v
-	out, _ := json.Marshal(&s)
-	after := string(out)
+	if !tar.fileExists(src) {
+		return (fmt.Sprintf("Database %s missing!", src)), status
+	} else {
 
-	input, err := os.ReadFile(src)
-	CheckError("ModifyField(1)", err)
-	lines := strings.Split(string(input), "\n")
-
-	for i, line := range lines {
-		if strings.Contains(line, before) {
-			lines[i] = after
+		before := tar.SelectByID(id, "raw")
+		if strings.Contains(before, "Record") && strings.Contains(before, "empty!") {
+			status = false
+			return before, status
 		}
-	}
-	output := strings.Join(lines, "\n")
-	err = os.WriteFile(src, []byte(output), 0644)
-	CheckError("ModifyField(2)", err)
+		var s MyStruct
+		s.Id = id
+		s.Key = k
+		s.Data = v
+		out, _ := json.Marshal(&s)
+		after := string(out)
 
-	msg = tar.SelectByID(id, "raw")
-	return msg, status
+		input, err := os.ReadFile(src)
+		CheckError("ModifyField(1)", err)
+		lines := strings.Split(string(input), "\n")
+
+		for i, line := range lines {
+			if strings.Contains(line, before) {
+				lines[i] = after
+			}
+		}
+		output := strings.Join(lines, "\n")
+		err = os.WriteFile(src, []byte(output), 0644)
+		CheckError("ModifyField(2)", err)
+
+		msg = tar.SelectByID(id, "raw")
+		return msg, status
+	}
 }
 
 // CountSize will return number of rows in the tardigrade.db
@@ -252,21 +259,20 @@ func (tar *Tardigrade) UniqueID() int {
 }
 
 // FirstXFields returns first X number of entries from database in byte[] format
-//
-// Example:
-// specify number of fields to return FirstXFields(2)
-func (tar *Tardigrade) FirstXFields(count int) []byte {
+// Example: (0.1.2)
+// specify number of fields X and format [ raw | json | id | key | value ] to return FirstXFields(2)
+func (tar *Tardigrade) FirstXFields(count int, format string) (string, []byte) {
 
 	var allRecord []byte
 
 	src := DBFile
 	if !tar.fileExists(src) {
-		return []byte(fmt.Sprintf("Database %s missing!", src))
+		return format, []byte(fmt.Sprintf("Database %s missing!", src))
 	} else {
 		fInfo, _ := os.Stat(src)
 		fsize := fInfo.Size()
 		if fsize <= 1 {
-			return []byte(fmt.Sprintf("Database %s is empty!", src))
+			return format, []byte(fmt.Sprintf("Database %s is empty!", src))
 		} else {
 			var allRecords []MyStruct
 			xFields := new(MyStruct)
@@ -302,42 +308,44 @@ func (tar *Tardigrade) FirstXFields(count int) []byte {
 			CheckError("FirstXFields(3)", err)
 		}
 	}
-	return allRecord
+	return format, allRecord
 }
 
 // LastXFields returns last X numbers of entries from db in byte[] format
 //
 // Example:
 // specify number of fields to return LastXFields(2)
-func (tar *Tardigrade) LastXFields(count int) []byte {
+func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
 
 	var allRecord []byte
-	var allRecords []MyStruct
-	var lastLine, start, end = 0, 0, 0
-	line := ""
 
 	src := DBFile
 	if !tar.fileExists(src) {
-		return []byte(fmt.Sprintf("Failed: database %s missing!", src))
+		return format, []byte(fmt.Sprintf("Database %s missing!", src))
 	} else {
 		fInfo, _ := os.Stat(src)
 		fsize := fInfo.Size()
 		if fsize <= 1 {
-			return []byte(fmt.Sprintf("Failed: database %s is empty!", src))
+			return format, []byte(fmt.Sprintf("Database %s is empty!", src))
 		} else {
+			var allRecords []MyStruct
+			var lastLine, start, end = 0, 0, 0
+			line := ""
+
+			if count == 1 {
+				count = 0
+			}
+
 			if tar.CountSize() < count {
 				count = tar.CountSize()
-			} else if count > 1 {
+			} else if count >= 2 {
 				count = count - 1
 			}
+
 			xFields := new(MyStruct)
 			var tmpStruct MyStruct
 
-			if count == 1 {
-				start = tar.CountSize()
-			} else {
-				start = tar.CountSize() - count
-			}
+			start = tar.CountSize() - count
 			end = tar.CountSize()
 
 			file, err := os.Open(src)
@@ -365,7 +373,7 @@ func (tar *Tardigrade) LastXFields(count int) []byte {
 			CheckError("LastXFields(3)", err)
 		}
 	}
-	return allRecord
+	return format, allRecord
 }
 
 // FirstField returns the first entry in the database in all formats [ raw | json | id | key | value ],
@@ -376,12 +384,12 @@ func (tar *Tardigrade) FirstField(f string) string {
 
 	src := DBFile
 	if !tar.fileExists(src) {
-		return fmt.Sprintf("Failed: database %s missing!", src)
+		return fmt.Sprintf("Database %s missing!", src)
 	} else {
 		fInfo, _ := os.Stat(src)
 		fsize := fInfo.Size()
 		if fsize <= 1 {
-			return fmt.Sprintf("Failed: database %s is empty!", src)
+			return fmt.Sprintf("Database %s is empty!", src)
 		} else {
 			lastLine := 0
 			line := ""
@@ -404,7 +412,7 @@ func (tar *Tardigrade) FirstField(f string) string {
 			CheckError("FirstField(2)", err)
 
 			if f == "json" {
-				out, _ := json.MarshalIndent(&s, "", "	")
+				out, _ := json.MarshalIndent(&s, "", "  ")
 				result = string(out)
 			} else if f == "value" {
 				result = string(s.Data)
@@ -457,7 +465,7 @@ func (tar *Tardigrade) LastField(f string) string {
 			CheckError("LastField(2)", err)
 
 			if f == "json" {
-				out, _ := json.MarshalIndent(&s, "", "	")
+				out, _ := json.MarshalIndent(&s, "", "  ")
 				result = string(out)
 			} else if f == "value" {
 				result = string(s.Data)
@@ -473,4 +481,65 @@ func (tar *Tardigrade) LastField(f string) string {
 		}
 	}
 	return result
+}
+
+// SelectSearch function takes in a single or multiple words(comma,separated) and format type, Returns the format [ raw | json | id | key | value ] and []bytes array with result
+// search will need to match ALL words for it to be true and return result.
+func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
+	search = strings.ReplaceAll(search, " ", ",")
+	split := strings.Split(search, ",")
+	size := len(split)
+
+	var allRecord []byte
+
+	src := DBFile
+	if !tar.fileExists(src) {
+		return format, []byte(fmt.Sprintf("Database %s missing!", src))
+	} else {
+		fInfo, _ := os.Stat(src)
+		fsize := fInfo.Size()
+		if fsize <= 1 {
+			return format, []byte(fmt.Sprintf("Database %s is empty!", src))
+		} else {
+			var allRecords []MyStruct
+			xFields := new(MyStruct)
+			var tmpStruct MyStruct
+			line := ""
+
+			file, err := os.Open(src)
+			CheckError("SelectSearch(1)", err)
+
+			defer file.Close()
+			var r io.Reader = file
+			sc := bufio.NewScanner(r)
+			containsAll := true
+
+			for sc.Scan() {
+				line = sc.Text()
+				for i := 0; i < size; i++ {
+					for x := 0; x < size; x++ {
+						if !strings.Contains(line, split[x]) {
+							containsAll = false
+						}
+					}
+				}
+				if containsAll {
+					in := []byte(line)
+					err = json.Unmarshal(in, &tmpStruct)
+					CheckError("SelectSearch(2)", err)
+
+					xFields.Id = tmpStruct.Id
+					xFields.Key = string(tmpStruct.Key)
+					xFields.Data = string(tmpStruct.Data)
+					allRecords = append(allRecords, *xFields)
+				}
+				containsAll = true
+
+			}
+			allRecord, err = json.Marshal(allRecords)
+			CheckError("SelectSearch(3)", err)
+		}
+	}
+	return format, allRecord
+
 }

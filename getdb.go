@@ -1,8 +1,10 @@
 package tardigrade
 
+// Built Sat 25 Feb 16:15:57 GMT 2023
+
 const DBFile = "tardigrade.db"
-const Release = "0.0.4"
-const Updated = "Thu 16 Feb 19:13:27 GMT 2023"
+const Release = "0.1.0"
+const Updated = "Sat 25 Feb 16:15:57 GMT 2023"
 
 // Tardigrade is the main structure
 type Tardigrade struct{}

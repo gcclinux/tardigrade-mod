@@ -1,7 +1,7 @@
 
 ## This is the mod version of the is small and simple noSQL database app for small GO apps.
-*updated:  Thu 16 Feb 19:13:27 GMT 2023*<br>
-*release:  0.0.4*
+*updated:  Sat 25 Feb 16:15:57 GMT 2023*<br>
+*release:  0.1.0*
 
 <br>
 
@@ -31,6 +31,7 @@ func (*Tardigrade).ModifyField(id int, k string, v string) (msg string, status b
 func (*Tardigrade).RemoveField(id int) (string, bool)
 func (*Tardigrade).SelectByID(id int, f string) string
 func (*Tardigrade).UniqueID() int
+func (*Tardigrade).SelectSearch(search, format string) (string, []byte)
 ```
 
 # HOW-TO-USE
@@ -353,9 +354,49 @@ Example 2: (false)
 	change, status := tar.ModifyField(100, "Updated key 2", "with new Updated data set with and new inforation")
 	fmt.Println(change, status)
 
-result:
+Result:
 	Record 100 is empty! false
 
+```
+**SelectSearch function takes in a single or multiple words(comma,separated) and format type, Returns true values in all formats**
+>SelectSearch("patern1,pattern2","json")
+```
+Example:
+	tar := tardigrade.Tardigrade{}
+	var format, received = tar.SelectSearch("word1,33,representing","json")
+	bytes := received
+	var data []MyStruct
+	json.Unmarshal(bytes, &data)
+
+	if (strings.Contains(string(received), "Database") && strings.Contains(string(received), "missing")) || (strings.Contains(string(received), "Database") && strings.Contains(string(received), "empty")) {
+		fmt.Println(string(received))
+		fmt.Println()
+	}
+
+	for x := range data {
+		if format == "json" {
+			out, _ := json.MarshalIndent(&data[x], "", "  ")
+			fmt.Printf("%v", string(out))
+			fmt.Println()
+		} else if format == "value" {
+			fmt.Println(string(data[x].Data))
+			fmt.Println()
+		} else if format == "raw" {
+			fmt.Printf("id: %d, key: %v, data: %s\n", data[x].Id, data[x].Key, data[x].Data)
+		} else if format == "key" {
+			fmt.Printf("%v\n", data[x].Key)
+		} else if format == "id" {
+			fmt.Println(strconv.Itoa(data[x].Id))
+			fmt.Println()
+		} else {
+			fmt.Printf("Invalid format provided!")
+		}
+Result:
+{
+        "id": 66,
+        "key": "New string word1",
+        "data": "string of data representing with value 33"
+}
 ```
 
 Additon couple of informaional functions
@@ -377,8 +418,8 @@ Example:
 	}
 
 Result:
-	Thu 16 Feb 19:13:27 GMT 2023
-	0.0.3
+	Sat 25 Feb 16:15:57 GMT 2023
+	0.1.0
 ```
 
 
@@ -389,6 +430,7 @@ RELEASE NOTE:
 ** release 0.0.2 - Updated README.md and corrected some issues.
 ** release 0.0.3 - Modified to use structure method
 ** release 0.0.4 - Converted tardigrade app to tardigrade-mod
+** release 0.1.0 - Several functions added from tardigrade app here
 ```
 
 OUTSTANDING:
