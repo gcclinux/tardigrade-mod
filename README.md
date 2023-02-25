@@ -362,41 +362,65 @@ Result:
 >SelectSearch("patern1,pattern2","json")
 ```
 Example:
-	tar := tardigrade.Tardigrade{}
-	var format, received = tar.SelectSearch("word1,33,representing","json")
-	bytes := received
-	var data []MyStruct
-	json.Unmarshal(bytes, &data)
+	package main
 
-	if (strings.Contains(string(received), "Database") && strings.Contains(string(received), "missing")) || (strings.Contains(string(received), "Database") && strings.Contains(string(received), "empty")) {
-		fmt.Println(string(received))
-		fmt.Println()
+	import (
+		"encoding/json"
+		"fmt"
+		"strconv"
+		"strings"
+
+		"github.com/gcclinux/tardigrade-mod"
+	)
+
+	func main() {
+		tar := tardigrade.Tardigrade{}
+		status := tar.AddField("New string Entry word1", "string of data representing a the word2")
+		fmt.Println(status)
+
+		type MyStruct struct {
+			Id   int
+			Key  string
+			Data string
+		}
+
+		var format, received = tar.SelectSearch("word1,word", "json")
+		bytes := received
+		var data []MyStruct
+		json.Unmarshal(bytes, &data)
+
+		if (strings.Contains(string(received), "Database") && strings.Contains(string(received), "missing")) || (strings.Contains(string(received), "Database") && strings.Contains(string(received), "empty")) {
+			fmt.Println(string(received))
+			fmt.Println()
+		}
+
+		for x := range data {
+			if format == "json" {
+				out, _ := json.MarshalIndent(&data[x], "", "  ")
+				fmt.Printf("%v", string(out))
+				fmt.Println()
+			} else if format == "value" {
+				fmt.Println(string(data[x].Data))
+				fmt.Println()
+			} else if format == "raw" {
+				fmt.Printf("id: %d, key: %v, data: %s\n", data[x].Id, data[x].Key, data[x].Data)
+			} else if format == "key" {
+				fmt.Printf("%v\n", data[x].Key)
+			} else if format == "id" {
+				fmt.Println(strconv.Itoa(data[x].Id))
+				fmt.Println()
+			} else {
+				fmt.Printf("Invalid format provided!")
+			}
+		}
+	}
+Result:
+	{
+	"Id": 1,
+	"Key": "New string Entry word1",
+	"Data": "string of data representing a the word2"
 	}
 
-	for x := range data {
-		if format == "json" {
-			out, _ := json.MarshalIndent(&data[x], "", "  ")
-			fmt.Printf("%v", string(out))
-			fmt.Println()
-		} else if format == "value" {
-			fmt.Println(string(data[x].Data))
-			fmt.Println()
-		} else if format == "raw" {
-			fmt.Printf("id: %d, key: %v, data: %s\n", data[x].Id, data[x].Key, data[x].Data)
-		} else if format == "key" {
-			fmt.Printf("%v\n", data[x].Key)
-		} else if format == "id" {
-			fmt.Println(strconv.Itoa(data[x].Id))
-			fmt.Println()
-		} else {
-			fmt.Printf("Invalid format provided!")
-		}
-Result:
-{
-        "id": 66,
-        "key": "New string word1",
-        "data": "string of data representing with value 33"
-}
 ```
 
 Additon couple of informaional functions
