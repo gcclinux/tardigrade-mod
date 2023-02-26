@@ -486,6 +486,7 @@ func (tar *Tardigrade) LastField(f string) string {
 // SelectSearch function takes in a single or multiple words(comma,separated) and format type, Returns the format [ raw | json | id | key | value ] and []bytes array with result
 // search will need to match ALL words for it to be true and return result.
 func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
+	search = strings.ToLower(search)
 	search = strings.ReplaceAll(search, " ", ",")
 	split := strings.Split(search, ",")
 	size := len(split)
@@ -515,7 +516,7 @@ func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
 			containsAll := true
 
 			for sc.Scan() {
-				line = sc.Text()
+				line = strings.ToLower(sc.Text())
 				for i := 0; i < size; i++ {
 					for x := 0; x < size; x++ {
 						if !strings.Contains(line, split[x]) {
