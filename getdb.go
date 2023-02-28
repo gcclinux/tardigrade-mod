@@ -3,7 +3,7 @@ package tardigrade
 // Built Sat 25 Feb 16:15:57 GMT 2023
 
 const DBFile = "tardigrade.db"
-const Release = "0.1.0"
+const Release = "0.1.1"
 const Updated = "Sat 25 Feb 16:15:57 GMT 2023"
 
 // Tardigrade is the main structure

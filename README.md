@@ -443,7 +443,7 @@ Example:
 
 Result:
 	Sat 25 Feb 16:15:57 GMT 2023
-	0.1.0
+	0.1.1
 ```
 
 
@@ -455,6 +455,7 @@ RELEASE NOTE:
 ** release 0.0.3 - Modified to use structure method
 ** release 0.0.4 - Converted tardigrade app to tardigrade-mod
 ** release 0.1.0 - Several functions added from tardigrade app here
+** release 0.1.1 - Bug fix storing string with encoder.SetEscapeHTML(false)
 ```
 
 OUTSTANDING:
