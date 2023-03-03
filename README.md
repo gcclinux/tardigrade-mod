@@ -1,5 +1,5 @@
 
-## This is the mod version of the is small and simple noSQL database app for small GO apps.
+## This is the mod version of the is small and simple no-SQL database app for small GO apps.
 *updated:  Fri  3 Mar 21:18:31 GMT 2023*<br>
 *release:  0.1.3*
 
