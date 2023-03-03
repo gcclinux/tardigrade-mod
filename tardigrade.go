@@ -1,6 +1,6 @@
 package tardigrade
 
-// Updated: Mon 27 Feb 22:58:49 GMT 2023
+// Updated: Fri  3 Mar 10:18:31 UTC 2023
 
 import (
 	"bufio"
@@ -569,7 +569,7 @@ func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
 					}
 				}
 				if containsAll {
-					in := []byte(line)
+					in := []byte(sc.Text())
 					err = json.Unmarshal(in, &tmpStruct)
 					CheckError("SelectSearch(2)", err)
 

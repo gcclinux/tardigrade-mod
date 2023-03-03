@@ -1,12 +1,12 @@
 
 ## This is the mod version of the is small and simple noSQL database app for small GO apps.
-*updated:  Sat 25 Feb 16:15:57 GMT 2023*<br>
-*release:  0.1.0*
+*updated:  Fri  3 Mar 10:18:31 UTC 2023*<br>
+*release:  0.1.2*
 
 <br>
 
 ## Getting Started
->go get [github.com/gcclinux/tardigrade-mod](github.com/gcclinux/tardigrade-mod)
+>go get [github.com/gcclinux/tardigrade-mod](http://github.com/gcclinux/tardigrade-mod)
 
 <BR>
 
@@ -456,6 +456,7 @@ RELEASE NOTE:
 ** release 0.0.4 - Converted tardigrade app to tardigrade-mod
 ** release 0.1.0 - Several functions added from tardigrade app here
 ** release 0.1.1 - Bug fix storing string with encoder.SetEscapeHTML(false)
+** release 0.1.2 - Bug fix returning string in lower case (fixed)
 ```
 
 OUTSTANDING:
