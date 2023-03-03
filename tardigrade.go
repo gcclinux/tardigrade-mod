@@ -23,7 +23,7 @@ type MyStruct struct {
 }
 
 // getOS function return specific OS PATH_SEPARATOR and Compiled file name unic to this App
-func (tar *Tardigrade) getOS() (string, rune) {
+func (tar *Tardigrade) GetOS() (string, rune) {
 	PATH_SEPARATOR := '/'
 	BIN_NAME := ""
 
