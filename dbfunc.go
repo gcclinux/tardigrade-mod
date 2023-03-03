@@ -23,7 +23,7 @@ func (tar *Tardigrade) CreatedDBCopy() (msg string, status bool) {
 	CheckError("CreatedDBCopy(1)", err)
 	defer fin.Close()
 
-	_, PATH_SEPARATOR := tar.GetOS()
+	PATH_SEPARATOR := tar.GetOS()
 	dst := fmt.Sprintf("%s%s%s", dirname, string(PATH_SEPARATOR), target)
 	buf := make([]byte, 1024)
 	tmp, err := os.Create(dst)
