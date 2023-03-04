@@ -1,6 +1,6 @@
 package tardigrade
 
-// Built Sat 25 Feb 16:15:57 GMT 2023
+// Updated Sat  4 Mar 18:56:11 GMT 2023
 
 import (
 	"bufio"
@@ -52,7 +52,7 @@ func (tar *Tardigrade) AddField(key, data string) bool {
 	getStruct.Key = key
 	getStruct.Data = data
 
-	response, err := MyMarshal(getStruct)
+	response, err := tar.MyMarshal(getStruct)
 	CheckError("Marshal", err)
 
 	file, err := os.OpenFile(DBFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
@@ -149,7 +149,7 @@ func (tar *Tardigrade) SelectByID(id int, f string) string {
 				CheckError("SelectByID(2)", err)
 
 				if f == "json" {
-					out, _ := MyIndent(&s, "", "  ")
+					out, _ := tar.MyIndent(&s, "", "  ")
 					result = string(out)
 				} else if f == "value" {
 					result = string(s.Data)
@@ -186,7 +186,7 @@ func (tar *Tardigrade) ModifyField(id int, k, v string) (msg string, status bool
 		s.Id = id
 		s.Key = k
 		s.Data = v
-		out, _ := MyMarshal(&s)
+		out, _ := tar.MyMarshal(&s)
 		after := string(out)
 
 		input, err := os.ReadFile(src)
@@ -304,7 +304,7 @@ func (tar *Tardigrade) FirstXFields(count int, format string) (string, []byte) {
 					allRecords = append(allRecords, *xFields)
 				}
 			}
-			allRecord, err = MyMarshal(allRecords)
+			allRecord, err = tar.MyMarshal(allRecords)
 			CheckError("FirstXFields(3)", err)
 		}
 	}
@@ -369,7 +369,7 @@ func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
 					allRecords = append(allRecords, *xFields)
 				}
 			}
-			allRecord, err = MyMarshal(allRecords)
+			allRecord, err = tar.MyMarshal(allRecords)
 			CheckError("LastXFields(3)", err)
 		}
 	}
@@ -412,7 +412,7 @@ func (tar *Tardigrade) FirstField(f string) string {
 			CheckError("FirstField(2)", err)
 
 			if f == "json" {
-				out, _ := MyIndent(&s, "", "  ")
+				out, _ := tar.MyIndent(&s, "", "  ")
 				result = string(out)
 			} else if f == "value" {
 				result = string(s.Data)
@@ -465,7 +465,7 @@ func (tar *Tardigrade) LastField(f string) string {
 			CheckError("LastField(2)", err)
 
 			if f == "json" {
-				out, _ := MyIndent(&s, "", "  ")
+				out, _ := tar.MyIndent(&s, "", "  ")
 				result = string(out)
 			} else if f == "value" {
 				result = string(s.Data)
@@ -537,7 +537,7 @@ func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
 				containsAll = true
 
 			}
-			allRecord, err = MyMarshal(allRecords)
+			allRecord, err = tar.MyMarshal(allRecords)
 			CheckError("SelectSearch(3)", err)
 		}
 	}

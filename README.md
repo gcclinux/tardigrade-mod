@@ -1,7 +1,7 @@
 
 ## This is the mod version of the is small and simple no-SQL database app for small GO apps.
-*updated:  Sat 4 Mar 12:32:07 GMT 2023*<br>
-*release:  0.1.4*
+*updated:  Sat 4 Mar 18:56:11 GMT 2023*<br>
+*release:  0.2.0*
 
 <br>
 
@@ -32,6 +32,8 @@ func (*Tardigrade).RemoveField(id int) (string, bool)
 func (*Tardigrade).SelectByID(id int, f string) string
 func (*Tardigrade).UniqueID() int
 func (*Tardigrade).SelectSearch(search, format string) (string, []byte)
+func (*Tardigrade) MyMarshal(t interface{}) ([]byte, error)
+func (*Tardigrade) MyIndent(v interface{}, prefix, indent string) ([]byte, error) 
 ```
 
 # HOW-TO-USE
@@ -358,7 +360,7 @@ Result:
 	Record 100 is empty! false
 
 ```
-**SelectSearch function takes in a single or multiple words(comma,separated) and format type, Returns true values in all formats**
+**SelectSearch function takes in a single or multiple words(comma, or space separated) and format type, Returns true values in all formats**
 >SelectSearch("patern1,pattern2","json")
 ```
 Example:
@@ -423,7 +425,7 @@ Result:
 
 ```
 
-Additon couple of informaional functions
+Additional couple of informational functions
 ```
 Example:
 	package main
@@ -442,8 +444,8 @@ Example:
 	}
 
 Result:
-	Sat  4 Mar 12:32:07 GMT 2023
-	0.1.4
+	Sat 4 Mar 18:56:11 GMT 2023
+	0.2.0
 ```
 
 
@@ -458,6 +460,7 @@ RELEASE NOTE:
 ** release 0.1.2 - Bug fix returning string in lower case (fixed)
 ** release 0.1.3 - Bug fix function set to lower case was unaccessible
 ** release 0.1.4 - Bug fix storing string with encoder.SetEscapeHTML(false)
+** release 0.2.0 - Added 2 new functions to Tardigrade main struct
 ```
 
 OUTSTANDING:

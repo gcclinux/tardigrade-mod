@@ -8,7 +8,7 @@ import (
 )
 
 // MyMarshal function is adapted to SetEscapeHTML to false before encoding
-func MyMarshal(t interface{}) ([]byte, error) {
+func (tar *Tardigrade) MyMarshal(t interface{}) ([]byte, error) {
 	buffer := &bytes.Buffer{}
 	encoder := json.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)
@@ -17,8 +17,8 @@ func MyMarshal(t interface{}) ([]byte, error) {
 }
 
 // MyIndent function is adapted to SetEscapeHTML to false before encoding and indenting
-func MyIndent(v interface{}, prefix, indent string) ([]byte, error) {
-	b, err := MyMarshal(v)
+func (tar *Tardigrade) MyIndent(v interface{}, prefix, indent string) ([]byte, error) {
+	b, err := tar.MyMarshal(v)
 	if err != nil {
 		return nil, err
 	}
