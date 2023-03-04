@@ -22,10 +22,10 @@ func (tar *Tardigrade) MyIndent(v interface{}, prefix, indent string) ([]byte, e
 	if err != nil {
 		return nil, err
 	}
-	var buf bytes.Buffer
-	err = json.Indent(&buf, b, prefix, indent)
+	var buffer bytes.Buffer
+	err = json.Indent(&buffer, b, prefix, indent)
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return buffer.Bytes(), nil
 }

@@ -57,8 +57,8 @@ func (tar *Tardigrade) AddField(key, data string) bool {
 
 	file, err := os.OpenFile(DBFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	CheckError("O_APPEND", err)
+	//file.WriteString("\n")
 	file.Write(response)
-	file.WriteString("\n")
 
 	return true
 }
