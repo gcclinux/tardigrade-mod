@@ -1,0 +1,31 @@
+package tardigrade
+
+// Built Sat 4 Mar 12:32:07 GMT 2023
+
+import (
+	"bytes"
+	"encoding/json"
+)
+
+// MyMarshal function is adapted to SetEscapeHTML to false before encoding
+func MyMarshal(t interface{}) ([]byte, error) {
+	buffer := &bytes.Buffer{}
+	encoder := json.NewEncoder(buffer)
+	encoder.SetEscapeHTML(false)
+	err := encoder.Encode(t)
+	return buffer.Bytes(), err
+}
+
+// MyIndent function is adapted to SetEscapeHTML to false before encoding and indenting
+func MyIndent(v interface{}, prefix, indent string) ([]byte, error) {
+	b, err := MyMarshal(v)
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	err = json.Indent(&buf, b, prefix, indent)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}

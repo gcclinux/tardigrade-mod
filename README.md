@@ -1,7 +1,7 @@
 
 ## This is the mod version of the is small and simple no-SQL database app for small GO apps.
-*updated:  Fri  3 Mar 21:18:31 GMT 2023*<br>
-*release:  0.1.3*
+*updated:  Sat 4 Mar 12:32:07 GMT 2023*<br>
+*release:  0.1.4*
 
 <br>
 
@@ -442,8 +442,8 @@ Example:
 	}
 
 Result:
-	Sat 25 Feb 16:15:57 GMT 2023
-	0.1.1
+	Sat  4 Mar 12:32:07 GMT 2023
+	0.1.4
 ```
 
 
@@ -455,9 +455,9 @@ RELEASE NOTE:
 ** release 0.0.3 - Modified to use structure method
 ** release 0.0.4 - Converted tardigrade app to tardigrade-mod
 ** release 0.1.0 - Several functions added from tardigrade app here
-** release 0.1.1 - Bug fix storing string with encoder.SetEscapeHTML(false)
 ** release 0.1.2 - Bug fix returning string in lower case (fixed)
 ** release 0.1.3 - Bug fix function set to lower case was unaccessible
+** release 0.1.4 - Bug fix storing string with encoder.SetEscapeHTML(false)
 ```
 
 OUTSTANDING:
