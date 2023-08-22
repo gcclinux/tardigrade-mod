@@ -4,6 +4,9 @@ package tardigrade
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/base64"
 	"encoding/json"
 )
 
@@ -28,4 +31,46 @@ func (tar *Tardigrade) MyIndent(v interface{}, prefix, indent string) ([]byte, e
 		return nil, err
 	}
 	return buffer.Bytes(), nil
+}
+
+// MyEncode returns the base64 encoding of source
+func (tar *Tardigrade) MyEncode(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+// MyDecode returns the bytes represented by the base64 string s
+func (tar *Tardigrade) MyDecode(s string) []byte {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		panic(err)
+	}
+	return data
+}
+
+var bytez = []byte{33, 45, 67, 28, 75, 15, 26, 77, 97, 25, 28, 91, 55, 31, 44, 69}
+
+// Encrypt method is to encrypt or hide any classified text
+func (tar *Tardigrade) MyEncrypt(text, Password string) (string, error) {
+	block, err := aes.NewCipher([]byte(Password))
+	if err != nil {
+		return "", err
+	}
+	plainText := []byte(text)
+	cfb := cipher.NewCFBEncrypter(block, bytez)
+	cipherText := make([]byte, len(plainText))
+	cfb.XORKeyStream(cipherText, plainText)
+	return tar.MyEncode(cipherText), nil
+}
+
+// Decrypt method is to extract back the encrypted text
+func (tar *Tardigrade) Decrypt(text, Password string) (string, error) {
+	block, err := aes.NewCipher([]byte(Password))
+	if err != nil {
+		return "", err
+	}
+	cipherText := tar.MyDecode(text)
+	cfb := cipher.NewCFBDecrypter(block, bytez)
+	plainText := make([]byte, len(cipherText))
+	cfb.XORKeyStream(plainText, cipherText)
+	return string(plainText), nil
 }
