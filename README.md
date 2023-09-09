@@ -32,8 +32,12 @@ func (*Tardigrade).RemoveField(id int) (string, bool)
 func (*Tardigrade).SelectByID(id int, f string) string
 func (*Tardigrade).UniqueID() int
 func (*Tardigrade).SelectSearch(search, format string) (string, []byte)
-func (*Tardigrade) MyMarshal(t interface{}) ([]byte, error)
-func (*Tardigrade) MyIndent(v interface{}, prefix, indent string) ([]byte, error) 
+func (*Tardigrade).MyMarshal(t interface{}) ([]byte, error)
+func (*Tardigrade).MyIndent(v interface{}, prefix, indent string) ([]byte, error) 
+func (*Tardigrade).MyEncode(b []byte) string
+func (*Tardigrade).MyDecode(s string) []byte
+func (*Tardigrade).MyEncrypt(text, Password string) (string, error)
+func (*Tardigrade).MyDecrypt(text, Password string) (string, error)
 ```
 
 # HOW-TO-USE
@@ -467,5 +471,7 @@ RELEASE NOTE:
 
 OUTSTANDING:
 ```
-** Write and share some test functions
+** Write and share additional functions
+func (*Tardigrade).AddCryptField(key string, data string) bool
+func (*Tardigrade).SelectByIDdecrypt(id int, f string) string
 ```

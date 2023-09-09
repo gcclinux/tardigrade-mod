@@ -63,7 +63,7 @@ func (tar *Tardigrade) MyEncrypt(text, Password string) (string, error) {
 }
 
 // Decrypt method is to extract back the encrypted text
-func (tar *Tardigrade) Decrypt(text, Password string) (string, error) {
+func (tar *Tardigrade) MyDecrypt(text, Password string) (string, error) {
 	block, err := aes.NewCipher([]byte(Password))
 	if err != nil {
 		return "", err
