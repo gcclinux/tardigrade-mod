@@ -1,8 +1,6 @@
-package tardigrade
+package main
 
 // Updated - Sat 4 Mar 20:08:28 GMT 2023
-
-const DBFile = "tardigrade.db"
 const Release = "0.2.5"
 const Updated = "Sat 4 Mar 20:08:28 GMT 2023"
 

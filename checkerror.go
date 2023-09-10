@@ -1,4 +1,4 @@
-package tardigrade
+package main
 
 import "log"
 

@@ -1,4 +1,4 @@
-package tardigrade
+package main
 
 import (
 	"fmt"
@@ -8,13 +8,13 @@ import (
 )
 
 // CreatedDBCopy creates a copy of the Database and store in UserHomeDir().
-func (tar *Tardigrade) CreatedDBCopy() (msg string, status bool) {
+func (tar *Tardigrade) CreatedDBCopy(db string) (msg string, status bool) {
 	status = true
 	dirname, err := os.UserHomeDir()
 	CheckError("CreatedDBCopy(0)", err)
 	target := "tardigradecopy.db"
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		msg = fmt.Sprintf("Failed: database %s missing!", src)
 		return msg, false
@@ -56,9 +56,9 @@ buffering:
 }
 
 // CreateDB - This function will create a database file if it does not exist and return true | false
-func (tar *Tardigrade) CreateDB() (msg string, status bool) {
+func (tar *Tardigrade) CreateDB(db string) (msg string, status bool) {
 	status = true
-	fname := DBFile
+	fname := db
 	pwd, _ := filepath.Abs(fname)
 	if !tar.fileExists(fname) {
 		_, err := os.Create(fname)
@@ -76,8 +76,8 @@ func (tar *Tardigrade) CreateDB() (msg string, status bool) {
 }
 
 // DeleteDB - WARNING - this function delete the database file return true | false
-func (tar *Tardigrade) DeleteDB() (msg string, status bool) {
-	fname := DBFile
+func (tar *Tardigrade) DeleteDB(db string) (msg string, status bool) {
+	fname := db
 	status = true
 	pwd, _ := filepath.Abs(fname)
 	if tar.fileExists(fname) {
@@ -104,10 +104,10 @@ func (tar *Tardigrade) fileExists(filename string) bool {
 }
 
 // EmptyDB function - WARNING - this will destroy the database and all data stored in it!
-func (tar *Tardigrade) EmptyDB() (msg string, status bool) {
-	_, status = tar.DeleteDB()
+func (tar *Tardigrade) EmptyDB(db string) (msg string, status bool) {
+	_, status = tar.DeleteDB(db)
 	if status {
-		_, status = tar.CreateDB()
+		_, status = tar.CreateDB(db)
 		if !status {
 			status = false
 			msg = "Failed: no permission to re-create!"

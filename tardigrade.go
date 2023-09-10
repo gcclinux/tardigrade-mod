@@ -1,4 +1,4 @@
-package tardigrade
+package main
 
 // Updated Sat  4 Mar 18:56:11 GMT 2023
 
@@ -37,16 +37,16 @@ func (tar *Tardigrade) GetOS() rune {
 }
 
 // AddField take in (key, sprint) (data, string) and add to tardigrade.db
-func (tar *Tardigrade) AddField(key, data string) bool {
+func (tar *Tardigrade) AddField(key, data string, db string) bool {
 
-	if !tar.fileExists(DBFile) {
-		tar.CreateDB()
-		if !tar.fileExists(DBFile) {
+	if !tar.fileExists(db) {
+		tar.CreateDB(db)
+		if !tar.fileExists(db) {
 			return false
 		}
 	}
 
-	id := tar.UniqueID() + 1
+	id := tar.UniqueID(db) + 1
 	var getStruct = MyStruct{}
 	getStruct.Id = id
 	getStruct.Key = key
@@ -55,7 +55,7 @@ func (tar *Tardigrade) AddField(key, data string) bool {
 	response, err := tar.MyMarshal(getStruct)
 	CheckError("Marshal", err)
 
-	file, err := os.OpenFile(DBFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	file, err := os.OpenFile(db, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	CheckError("O_APPEND", err)
 	//file.WriteString("\n")
 	file.Write(response)
@@ -64,12 +64,12 @@ func (tar *Tardigrade) AddField(key, data string) bool {
 }
 
 // RemoveField function takes an unique field id as an input and remove the matching field entry
-func (tar *Tardigrade) RemoveField(id int) (string, bool) {
+func (tar *Tardigrade) RemoveField(id int, db string) (string, bool) {
 
 	status := true
 	msg := ""
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return (fmt.Sprintf("Database %s missing!", src)), false
 	} else {
@@ -78,14 +78,14 @@ func (tar *Tardigrade) RemoveField(id int) (string, bool) {
 		if fsize <= 1 {
 			return (fmt.Sprintf("Database %s is empty!", src)), false
 		} else {
-			line := tar.SelectByID(id, "raw")
+			line := tar.SelectByID(id, "raw", db)
 
 			if strings.Contains(line, "Record") && strings.Contains(line, "empty") {
 				status = false
 				msg = line
 			} else {
 				msg = line
-				fpath := DBFile
+				fpath := src
 				f, err := os.Open(fpath)
 				CheckError("RemoveField(1)", err)
 
@@ -115,12 +115,12 @@ func (tar *Tardigrade) RemoveField(id int) (string, bool) {
 }
 
 // SelectByID function returns an entry string for a specific id in all formats [ raw | json | id | key | value ]
-func (tar *Tardigrade) SelectByID(id int, f string) string {
+func (tar *Tardigrade) SelectByID(id int, f string, db string) string {
 
 	regx := fmt.Sprintf("\"id\":%v,", id)
 
 	result := ""
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return (fmt.Sprintf("Database %s missing!", src))
 	} else {
@@ -169,15 +169,15 @@ func (tar *Tardigrade) SelectByID(id int, f string) string {
 }
 
 // ModifyField function takes ID, Key, Value and update row = ID with new information provided
-func (tar *Tardigrade) ModifyField(id int, k, v string) (msg string, status bool) {
+func (tar *Tardigrade) ModifyField(id int, k, v string, db string) (msg string, status bool) {
 
 	status = true
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return (fmt.Sprintf("Database %s missing!", src)), status
 	} else {
 
-		before := tar.SelectByID(id, "raw")
+		before := tar.SelectByID(id, "raw", db)
 		if strings.Contains(before, "Record") && strings.Contains(before, "empty!") {
 			status = false
 			return before, status
@@ -202,15 +202,15 @@ func (tar *Tardigrade) ModifyField(id int, k, v string) (msg string, status bool
 		err = os.WriteFile(src, []byte(output), 0644)
 		CheckError("ModifyField(2)", err)
 
-		msg = tar.SelectByID(id, "raw")
+		msg = tar.SelectByID(id, "raw", db)
 		return msg, status
 	}
 }
 
 // CountSize will return number of rows in the tardigrade.db
-func (tar *Tardigrade) CountSize() int {
+func (tar *Tardigrade) CountSize(db string) int {
 
-	src := DBFile
+	src := db
 	f, err := os.Open(src)
 	CheckError("CountSize(1)", err)
 
@@ -246,13 +246,13 @@ func (tar *Tardigrade) CountSize() int {
 }
 
 // UniqueID function returns an int for the last used UniqueID to AutoIncrement in the AddField()
-func (tar *Tardigrade) UniqueID() int {
+func (tar *Tardigrade) UniqueID(db string) int {
 	lastID := 0
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return lastID
 	} else {
-		lastID, _ = strconv.Atoi(tar.LastField("id"))
+		lastID, _ = strconv.Atoi(tar.LastField("id", db))
 	}
 
 	return lastID
@@ -261,11 +261,11 @@ func (tar *Tardigrade) UniqueID() int {
 // FirstXFields returns first X number of entries from database in byte[] format
 // Example: (0.1.2)
 // specify number of fields X and format [ raw | json | id | key | value ] to return FirstXFields(2)
-func (tar *Tardigrade) FirstXFields(count int, format string) (string, []byte) {
+func (tar *Tardigrade) FirstXFields(count int, format string, db string) (string, []byte) {
 
 	var allRecord []byte
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return format, []byte(fmt.Sprintf("Database %s missing!", src))
 	} else {
@@ -315,11 +315,11 @@ func (tar *Tardigrade) FirstXFields(count int, format string) (string, []byte) {
 //
 // Example:
 // specify number of fields to return LastXFields(2)
-func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
+func (tar *Tardigrade) LastXFields(count int, format string, db string) (string, []byte) {
 
 	var allRecord []byte
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return format, []byte(fmt.Sprintf("Database %s missing!", src))
 	} else {
@@ -336,8 +336,8 @@ func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
 				count = 0
 			}
 
-			if tar.CountSize() < count {
-				count = tar.CountSize()
+			if tar.CountSize(db) < count {
+				count = tar.CountSize(db)
 			} else if count >= 2 {
 				count = count - 1
 			}
@@ -345,8 +345,8 @@ func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
 			xFields := new(MyStruct)
 			var tmpStruct MyStruct
 
-			start = tar.CountSize() - count
-			end = tar.CountSize()
+			start = tar.CountSize(db) - count
+			end = tar.CountSize(db)
 
 			file, err := os.Open(src)
 			CheckError("LastXFields(1)", err)
@@ -378,11 +378,11 @@ func (tar *Tardigrade) LastXFields(count int, format string) (string, []byte) {
 
 // FirstField returns the first entry in the database in all formats [ raw | json | id | key | value ],
 // must specify format required Example: FirstField("json")
-func (tar *Tardigrade) FirstField(f string) string {
+func (tar *Tardigrade) FirstField(f string, db string) string {
 
 	result := ""
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return fmt.Sprintf("Database %s missing!", src)
 	} else {
@@ -431,11 +431,11 @@ func (tar *Tardigrade) FirstField(f string) string {
 }
 
 // LastField returns the last entry of the database in all formats [ raw | json | id | key | value ] specify format required
-func (tar *Tardigrade) LastField(f string) string {
+func (tar *Tardigrade) LastField(f string, db string) string {
 
 	result := ""
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return fmt.Sprintf("Database %s missing!", src)
 	} else {
@@ -455,7 +455,7 @@ func (tar *Tardigrade) LastField(f string) string {
 
 			for sc.Scan() {
 				lastLine++
-				if lastLine == tar.CountSize() {
+				if lastLine == tar.CountSize(db) {
 					line = sc.Text()
 				}
 			}
@@ -485,7 +485,7 @@ func (tar *Tardigrade) LastField(f string) string {
 
 // SelectSearch function takes in a single or multiple words(comma,separated) and format type, Returns the format [ raw | json | id | key | value ] and []bytes array with result
 // search will need to match ALL words for it to be true and return result.
-func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
+func (tar *Tardigrade) SelectSearch(search, format string, db string) (string, []byte) {
 	search = strings.ToLower(search)
 	search = strings.ReplaceAll(search, " ", ",")
 	split := strings.Split(search, ",")
@@ -493,7 +493,7 @@ func (tar *Tardigrade) SelectSearch(search, format string) (string, []byte) {
 
 	var allRecord []byte
 
-	src := DBFile
+	src := db
 	if !tar.fileExists(src) {
 		return format, []byte(fmt.Sprintf("Database %s missing!", src))
 	} else {
