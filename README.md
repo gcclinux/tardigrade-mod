@@ -1,6 +1,6 @@
 
 ## This is the mod version of the is small and simple no-SQL database app for small GO apps.
-*updated:  Tue 22 Aug 2023 20:27:25 BST*<br>
+*updated:  Sun 10 Sep 18:54:19 BST 2023*<br>
 *release:  0.2.5*
 
 <br>
@@ -15,23 +15,23 @@ Current structure and available functions()
 ```
 type Tardigrade struct{}
 
-func (*Tardigrade).AddField(key string, data string) bool
-func (*Tardigrade).CountSize() int
-func (*Tardigrade).CreateDB() (msg string, status bool)
-func (*Tardigrade).CreatedDBCopy() (msg string, status bool)
-func (*Tardigrade).DeleteDB() (msg string, status bool)
-func (*Tardigrade).EmptyDB() (msg string, status bool)
-func (*Tardigrade).FirstField(f string) string
-func (*Tardigrade).FirstXFields(count int) []byte
+func (*Tardigrade).AddField(key string, data string, db string) bool
+func (*Tardigrade).CountSize(db string) int
+func (*Tardigrade).CreateDB(db string) (msg string, status bool)
+func (*Tardigrade).CreatedDBCopy(db string) (msg string, status bool)
+func (*Tardigrade).DeleteDB(db string) (msg string, status bool)
+func (*Tardigrade).EmptyDB(db string) (msg string, status bool)
+func (*Tardigrade).FirstField(f string, db string) string
+func (*Tardigrade).FirstXFields(count int, db string) []byte
 func (*Tardigrade).GetUpdated() (updated string)
 func (*Tardigrade).GetVersion() (release string)
-func (*Tardigrade).LastField(f string) string
-func (*Tardigrade).LastXFields(count int) []byte
-func (*Tardigrade).ModifyField(id int, k string, v string) (msg string, status bool)
-func (*Tardigrade).RemoveField(id int) (string, bool)
-func (*Tardigrade).SelectByID(id int, f string) string
-func (*Tardigrade).UniqueID() int
-func (*Tardigrade).SelectSearch(search, format string) (string, []byte)
+func (*Tardigrade).LastField(f string, db string) string
+func (*Tardigrade).LastXFields(count int, db string) []byte
+func (*Tardigrade).ModifyField(id int, k string, v string, db string) (msg string, status bool)
+func (*Tardigrade).RemoveField(id int, db string) (string, bool)
+func (*Tardigrade).SelectByID(id int, f string, db string) string
+func (*Tardigrade).UniqueID(db string) int
+func (*Tardigrade).SelectSearch(search, format string, db string) (string, []byte)
 func (*Tardigrade).MyMarshal(t interface{}) ([]byte, error)
 func (*Tardigrade).MyIndent(v interface{}, prefix, indent string) ([]byte, error) 
 func (*Tardigrade).MyEncode(b []byte) string
@@ -45,15 +45,15 @@ func (*Tardigrade).MyDecrypt(text, Password string) (string, error)
 <BR>
 
 **CreateDB - This function will create a database file if it does not exist and return true | false**
->function: CreateDB()
+>function: CreateDB(db string)
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
-	tar.CreateDB()
+	tar.CreateDB(db_name)
 
 Example 2 (capture return):
 	tar := tardigrade.Tardigrade{}
-	msg, status := tar.CreateDB()
+	msg, status := tar.CreateDB(db_name)
 	fmt.Println(msg, status)
 
 Return:
@@ -63,15 +63,15 @@ Return:
 ```
 
 **DeleteDB - WARNING - this function delete the database file return true | false**
->function: DeleteDB()
+>function: DeleteDB(db string)
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
-	tar.DeleteDB()
+	tar.DeleteDB(db_name)
 
 Example 2 (capture return):
 	tar := tardigrade.Tardigrade{}
-	msg, status := tar.DeleteDB()
+	msg, status := tar.DeleteDB(db_name)
 	fmt.Println(msg, status)
 
 Return:
@@ -80,16 +80,16 @@ Return:
 
 ```
 **CreatedDBCopy creates a copy of the Database and store in UserHomeDir()**
->function: CreatedDBCopy()
+>function: CreatedDBCopy(db string)
 
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
-	tar.CreatedDBCopy()
+	tar.CreatedDBCopy(db_name)
 
 Example 2 (capture return):
 	tar := tardigrade.Tardigrade{}
-	msg, status := tar.CreatedDBCopy()
+	msg, status := tar.CreatedDBCopy(db_name)
 	fmt.Println(msg, status)
 
 Return:
@@ -102,16 +102,16 @@ Return:
 
 **EmptyDB function - WARNING - this will destroy the database and all data stored in it!**
 
->function: EmptyDB() 
+>function: EmptyDB(db string) 
 
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
-	tar.EmptyDB()
+	tar.EmptyDB(db_name)
 
 Example 2 (capture return):
 	tar := tardigrade.Tardigrade{}
-	msg, status := tar.EmptyDB()
+	msg, status := tar.EmptyDB(db_name)
 	fmt.Println(msg, status)
 
 Return:
@@ -121,18 +121,18 @@ Return:
 
 ```
 
-**AddField() function take in ((key)string, (Value) string) and add to database.**
+**AddField() function take in ((key)string, (Value) string, db string) and add to database.**
 
 >function: AddField()
 
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
-	tar.AddField("New string Entry", "string of data representing a the value")
+	tar.AddField("New string Entry", "string of data representing a the value", "db_name")
 
 Example 2 (capture return):
 	tar := tardigrade.Tardigrade{}
-	status := tar.AddField("New string Entry", "string of data representing a the value")
+	status := tar.AddField("New string Entry", "string of data representing a the value", "db_name")
 	fmt.Println(status)
 
 Return:
@@ -142,12 +142,12 @@ Return:
 
 **CountSize() function will return number of rows in the gojsondb.db**
 
->function: CountSize()
+>function: CountSize(db string)
 
 ````
 Example (capture return):
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.CountSize())
+	fmt.Println(tar.CountSize("db_name"))
 
 Result:
 	44
@@ -155,12 +155,12 @@ Result:
 
 **FirstField func returns the first entry of gojsondb.db in all formats \[ raw | json | id | key | value ] specify format required**
 
->function: FirstField()
+>function: FirstField(db string)
 
 ```
 Example 1: (true | failed)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.FirstField("raw"))
+	fmt.Println(tar.FirstField("raw", "db_name"))
 
 Result: 
 	{"id":1,"key":"one","data":"string data test"}
@@ -169,7 +169,7 @@ Result:
 
 Example 2: (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.FirstField("json"))
+	fmt.Println(tar.FirstField("json","db_name"))
 
 Result:
 {
@@ -181,12 +181,12 @@ Result:
 
 **LastField() func returns the last entry in multi-format \[ raw | json | id | key | value ]**
 
->function: LastField()
+>function: LastField(db string)
 
 ```
 Example 1: (true | failed)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.FirstField("raw"))
+	fmt.Println(tar.FirstField("raw", "db_name"))
 
 Result: 
 	{"id":44,"key":"New Entry","data":"string of data representing a the value"}
@@ -195,21 +195,21 @@ Result:
 
 Example 2: (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.LastField("value"))
+	fmt.Println(tar.LastField("value", "db_name"))
 
 Result:
 	string of data representing a the value
 
 Example 3: (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.LastField("key"))
+	fmt.Println(tar.LastField("key", "db_name"))
 
 Result:
 	New Entry
 
 Example: 4 (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.LastField("json"))
+	fmt.Println(tar.LastField("json", "db_name"))
 
 Result:
 {
@@ -220,26 +220,26 @@ Result:
 ```
 
 **SelectByID func returns an entry string for a specific id in all formats \[ raw | json | id | key | value ]**
->function: SelectByID()
+>function: SelectByID(db string)
 
 ```
 Example 1: (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.SelectByID(10, "raw"))
+	fmt.Println(tar.SelectByID(10, "raw", "db_name"))
 
 Result:
 	{"id":10,"key":"Roman","data":"string of data representing a the value of X"}
 
 Example 2: (false)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.SelectByID(100, "raw"))
+	fmt.Println(tar.SelectByID(100, "raw", "db_name"))
 
 Result:
 	Record 100 is empty!
 
 Example 3: (true)
 	tar := tardigrade.Tardigrade{}
-	fmt.Println(tar.SelectByID(25, "json"))
+	fmt.Println(tar.SelectByID(25, "json", "db_name"))
 
 Result:
 {
@@ -250,12 +250,12 @@ Result:
 ```
 
 **UniqueID function returns an int for the last used UniqueID**
->function: UniqueID()
+>function: UniqueID(db string)
 
 ```
 Example: (always true)
 	tar := Tardigrade{}
-	fmt.Println(tar.UniqueID())
+	fmt.Println(tar.UniqueID("db_name"))
 
 Result:
 	52
@@ -263,12 +263,12 @@ Result:
 
 
 **FirstXFields returns last X number of entries from db in byte[] format**
->function: FirstXFields()
+>function: FirstXFields(db string)
 
 ```
 Example:
 	tar := tardigrade.Tardigrade{}
-	var received = tar.FirstXFields(2)
+	var received = tar.FirstXFields(2, "db_name")
 
 	type MyStruct struct {
 		Id   int
@@ -296,12 +296,12 @@ Result:
 ```
 
 **LastXFields returns last X number of entries from db in values byte[] format**
->function: LastXFields()
+>function: LastXFields(db string)
 
 ```
 Example 1: (always true)
 	tar := tardigrade.Tardigrade{}
-	var received = tar.LastXFields(2)
+	var received = tar.LastXFields(2, "db_name")
 
 	type MyStruct struct {
 		Id   int
@@ -329,12 +329,12 @@ Result:
 ```
 
 **RemoveField function takes an unique field id as an input and remove the matching field entry**
->function: RemoveField()
+>function: RemoveField(db string)
 
 ```
 Example 1: (true | false)
 	tar := tardigrade.Tardigrade{}
-	msg, status := tar.RemoveField(2)
+	msg, status := tar.RemoveField(2, "db_name")
 	fmt.Println(msg, status)
 
 Result:
@@ -344,12 +344,12 @@ Result:
 ```
 
 **ModifyField function takes ID, Key, Value and update row = ID with new information provided**
-> ModifyField(2, "Updated key", "Updated data set with new inforation")
+> ModifyField(2, "Updated key", "Updated data set with new inforation", "db_name")
 
 ```
 Example 1: (true)
 	tar := tardigrade.Tardigrade{}
-	change, status := tar.ModifyField(2, "Updated key 2", "with new Updated data set with and new inforation")
+	change, status := tar.ModifyField(2, "Updated key 2", "with new Updated data set with and new inforation", "db_name")
 	fmt.Println(change, status)
 
 Result:
@@ -357,7 +357,7 @@ Result:
 
 Example 2: (false)
 	tar := tardigrade.Tardigrade{}
-	change, status := tar.ModifyField(100, "Updated key 2", "with new Updated data set with and new inforation")
+	change, status := tar.ModifyField(100, "Updated key 2", "with new Updated data set with and new inforation", "db_name")
 	fmt.Println(change, status)
 
 Result:
@@ -365,7 +365,7 @@ Result:
 
 ```
 **SelectSearch function takes in a single or multiple words(comma, or space separated) and format type, Returns true values in all formats**
->SelectSearch("patern1,pattern2","json")
+>SelectSearch("patern1,pattern2","json", "db_name")
 ```
 Example:
 	package main
@@ -381,7 +381,7 @@ Example:
 
 	func main() {
 		tar := tardigrade.Tardigrade{}
-		status := tar.AddField("New string Entry word1", "string of data representing a the word2")
+		status := tar.AddField("New string Entry word1", "string of data representing a the word2", "db_name")
 		fmt.Println(status)
 
 		type MyStruct struct {
@@ -390,7 +390,7 @@ Example:
 			Data string
 		}
 
-		var format, received = tar.SelectSearch("word1,word", "json")
+		var format, received = tar.SelectSearch("word1,word", "json", "db_name")
 		bytes := received
 		var data []MyStruct
 		json.Unmarshal(bytes, &data)
@@ -466,12 +466,13 @@ RELEASE NOTE:
 ** release 0.1.4 - Bug fix storing string with encoder.SetEscapeHTML(false)
 ** release 0.2.0 - Added 2 new functions to Tardigrade main struct
 ** release 0.2.1 - Minor bug fix inntroduced in previous version
-** release 0.2.5 - Working Progress enabling data encryption
+** release 0.2.3 - Working Progress enabling data encryption
+** release 0.2.5 - Modified functions to include database name so an app can have more than 1 db
 ```
 
 OUTSTANDING:
 ```
 ** Write and share additional functions
-func (*Tardigrade).AddCryptField(key string, data string) bool
-func (*Tardigrade).SelectByIDdecrypt(id int, f string) string
+func (*Tardigrade).AddCryptField(key string, data string, db string) bool
+func (*Tardigrade).SelectByIDdecrypt(id int, f string, db string) string
 ```
