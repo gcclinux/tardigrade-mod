@@ -1,8 +1,8 @@
 package tardigrade
 
-// Updated - Sun 10 Sep 18:54:19 BST 2023
-const Release = "0.2.5"
-const Updated = "Sun 10 Sep 18:54:19 BST 2023"
+// Updated - Sun Jan 18 09:38:18 PM GMT 2026
+const Release = "0.3.0"
+const Updated = "Sun Jan 18 09:38:18 PM GMT 2026"
 
 // Tardigrade is the main structure
 type Tardigrade struct{}

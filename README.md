@@ -1,20 +1,122 @@
 
-## This is the mod version of the is small and simple no-SQL database app for small GO apps.
-*updated:  Sun 10 Sep 18:54:19 BST 2023*<br>
-*release:  0.2.5*
+# Tardigrade-Mod
 
-<br>
+> A lightweight, file-based NoSQL database library for Go applications
 
-## Getting Started
->go get [github.com/gcclinux/tardigrade-mod](http://github.com/gcclinux/tardigrade-mod)
+[![Go Version](https://img.shields.io/badge/Go-1.20+-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![License](https://img.shields.io/badge/License-See%20LICENSE-blue.svg)](LICENSE)
 
-<BR>
+**Version:** 0.3.0  
+**Updated:** Sun Jan 18 09:38:18 PM GMT 2026
 
-Current structure and available functions()
+## Overview
 
+Tardigrade-Mod is a simple, zero-dependency NoSQL database solution designed for small to medium-sized Go applications. It provides persistent key-value storage using JSON serialization with a file-based approach, making it perfect for applications that need data persistence without the complexity of a full database server.
+
+### Key Features
+
+- 🚀 **Zero Dependencies** - Pure Go with only standard library
+- 📁 **File-Based** - Single-file database for easy deployment
+- 🔍 **Search Capable** - Multi-keyword search functionality
+- 🔐 **Encryption Ready** - Built-in AES encryption utilities
+- 🖥️ **Cross-Platform** - Works on Linux, macOS, and Windows
+- 📊 **Multiple Formats** - Output data in raw, JSON, or field-specific formats
+- 🗄️ **Multi-Database** - Support for multiple database files per application
+- 🔧 **Flexible Schema** - Store records with any number of custom fields
+
+## Quick Start
+
+### Installation
+
+```bash
+go get github.com/gcclinux/tardigrade-mod
 ```
-type Tardigrade struct{}
 
+### Basic Example (Simple Key-Value)
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/gcclinux/tardigrade-mod"
+)
+
+func main() {
+    tar := tardigrade.Tardigrade{}
+    
+    // Create database
+    tar.CreateDB("myapp.db")
+    
+    // Add data
+    tar.AddField("user:1", "John Doe", "myapp.db")
+    tar.AddField("user:2", "Jane Smith", "myapp.db")
+    
+    // Retrieve data
+    result := tar.SelectByID(1, "json", "myapp.db")
+    fmt.Println(result)
+    
+    // Search
+    format, results := tar.SelectSearch("John", "json", "myapp.db")
+    fmt.Println(format, string(results))
+}
+```
+
+### Flexible Fields Example (Multiple Fields)
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/gcclinux/tardigrade-mod"
+)
+
+func main() {
+    tar := tardigrade.Tardigrade{}
+    tar.CreateDB("flexible.db")
+    
+    // Add record with multiple fields
+    tar.AddFlexFieldVariadic("user:1", "flexible.db",
+        "name", "ricardo wagemaker",
+        "status", "married",
+        "location", "london")
+    
+    // Add record with many fields
+    tar.AddFlexFieldVariadic("app:2", "flexible.db",
+        "cost", "299",
+        "billing", "monthly",
+        "patch", "17",
+        "color", "blue",
+        "os", "linux",
+        "mode", "auto")
+    
+    // Retrieve full record
+    result := tar.SelectFlexByID(1, "json", "flexible.db")
+    fmt.Println(result)
+    
+    // Get specific field
+    name := tar.GetFlexField(1, "name", "flexible.db")
+    fmt.Println("Name:", name)
+}
+```
+
+## Documentation
+
+- [DESIGN.md](DESIGN.md) - Architecture, design patterns, and technical specifications
+- [FLEXIBLE.md](FLEXIBLE.md) - Flexible fields feature guide and examples
+
+## API Reference
+
+### Structure and Available Functions
+
+#### Core Structure
+```go
+type Tardigrade struct{}
+```
+
+#### Standard Functions (Fixed Schema: id, key, data)
+```go
 func (*Tardigrade).AddField(key string, data string, db string) bool
 func (*Tardigrade).CountSize(db string) int
 func (*Tardigrade).CreateDB(db string) (msg string, status bool)
@@ -22,16 +124,31 @@ func (*Tardigrade).CreatedDBCopy(db string) (msg string, status bool)
 func (*Tardigrade).DeleteDB(db string) (msg string, status bool)
 func (*Tardigrade).EmptyDB(db string) (msg string, status bool)
 func (*Tardigrade).FirstField(f string, db string) string
-func (*Tardigrade).FirstXFields(count int, db string) []byte
+func (*Tardigrade).FirstXFields(count int, format string, db string) (string, []byte)
 func (*Tardigrade).GetUpdated() (updated string)
 func (*Tardigrade).GetVersion() (release string)
 func (*Tardigrade).LastField(f string, db string) string
-func (*Tardigrade).LastXFields(count int, db string) []byte
+func (*Tardigrade).LastXFields(count int, format string, db string) (string, []byte)
 func (*Tardigrade).ModifyField(id int, k string, v string, db string) (msg string, status bool)
 func (*Tardigrade).RemoveField(id int, db string) (string, bool)
 func (*Tardigrade).SelectByID(id int, f string, db string) string
 func (*Tardigrade).UniqueID(db string) int
 func (*Tardigrade).SelectSearch(search, format string, db string) (string, []byte)
+```
+
+#### Flexible Field Functions (Variable Schema)
+```go
+func (*Tardigrade).AddFlexField(key string, fields map[string]string, db string) bool
+func (*Tardigrade).AddFlexFieldVariadic(key string, db string, keyValuePairs ...string) bool
+func (*Tardigrade).SelectFlexByID(id int, format string, db string) string
+func (*Tardigrade).SelectFlexSearch(search, format string, db string) (string, []byte)
+func (*Tardigrade).GetFlexField(id int, fieldName string, db string) string
+func (*Tardigrade).ModifyFlexField(id int, key string, fields map[string]string, db string) (string, bool)
+func (*Tardigrade).ListFlexFields(id int, db string) []string
+```
+
+#### Utility Functions
+```go
 func (*Tardigrade).MyMarshal(t interface{}) ([]byte, error)
 func (*Tardigrade).MyIndent(v interface{}, prefix, indent string) ([]byte, error) 
 func (*Tardigrade).MyEncode(b []byte) string
@@ -40,12 +157,104 @@ func (*Tardigrade).MyEncrypt(text, Password string) (string, error)
 func (*Tardigrade).MyDecrypt(text, Password string) (string, error)
 ```
 
-# HOW-TO-USE
+## Detailed Usage Guide
 
-<BR>
+### Flexible Fields (NEW)
 
-**CreateDB - This function will create a database file if it does not exist and return true | false**
->function: CreateDB(db string)
+For records with multiple custom fields, use the flexible field functions. See [FLEXIBLE.md](docs/FLEXIBLE.md) for complete documentation.
+
+#### AddFlexFieldVariadic
+
+Adds a record with any number of custom fields.
+
+**Signature:** `AddFlexFieldVariadic(key string, db string, keyValuePairs ...string) bool`
+
+```go
+Example 1: Multiple fields
+	tar := tardigrade.Tardigrade{}
+	tar.AddFlexFieldVariadic("user:1", "mydb.db",
+		"name", "ricardo wagemaker",
+		"status", "married",
+		"location", "london")
+
+Example 2: Many fields
+	tar.AddFlexFieldVariadic("app:2", "mydb.db",
+		"cost", "299",
+		"billing", "monthly",
+		"patch", "17",
+		"color", "blue",
+		"os", "linux",
+		"mode", "auto")
+
+Result:
+	true | false
+```
+
+#### SelectFlexByID
+
+Retrieves a flexible record by ID.
+
+**Signature:** `SelectFlexByID(id int, format string, db string) string`
+
+**Formats:** `raw` | `json` | `id` | `key` | `fields`
+
+```go
+Example:
+	tar := tardigrade.Tardigrade{}
+	result := tar.SelectFlexByID(1, "json", "mydb.db")
+	fmt.Println(result)
+
+Result:
+{
+  "id": 1,
+  "key": "user:1",
+  "fields": {
+    "name": "ricardo wagemaker",
+    "status": "married",
+    "location": "london"
+  }
+}
+```
+
+#### GetFlexField
+
+Retrieves a specific field value from a record.
+
+**Signature:** `GetFlexField(id int, fieldName string, db string) string`
+
+```go
+Example:
+	tar := tardigrade.Tardigrade{}
+	name := tar.GetFlexField(1, "name", "mydb.db")
+	fmt.Println(name)
+
+Result:
+	ricardo wagemaker
+```
+
+#### ListFlexFields
+
+Lists all field names in a record.
+
+**Signature:** `ListFlexFields(id int, db string) []string`
+
+```go
+Example:
+	tar := tardigrade.Tardigrade{}
+	fields := tar.ListFlexFields(1, "mydb.db")
+	fmt.Println(fields)
+
+Result:
+	[name status location]
+```
+
+### Database Management
+
+#### CreateDB
+
+Creates a database file if it doesn't exist.
+
+**Signature:** `CreateDB(db string) (msg string, status bool)`
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
@@ -62,8 +271,11 @@ Return:
 
 ```
 
-**DeleteDB - WARNING - this function delete the database file return true | false**
->function: DeleteDB(db string)
+#### DeleteDB
+
+⚠️ **WARNING:** Permanently deletes the database file.
+
+**Signature:** `DeleteDB(db string) (msg string, status bool)`
 ```
 Example 1: (ignore return)
 	tar := tardigrade.Tardigrade{}
@@ -79,8 +291,11 @@ Return:
 	Unavailable: <full_path>/tardigrade.db false
 
 ```
-**CreatedDBCopy creates a copy of the Database and store in UserHomeDir()**
->function: CreatedDBCopy(db string)
+#### CreatedDBCopy
+
+Creates a backup copy of the database in the user's home directory.
+
+**Signature:** `CreatedDBCopy(db string) (msg string, status bool)`
 
 ```
 Example 1: (ignore return)
@@ -100,9 +315,11 @@ Return:
 
 ```
 
-**EmptyDB function - WARNING - this will destroy the database and all data stored in it!**
+#### EmptyDB
 
->function: EmptyDB(db string) 
+⚠️ **WARNING:** Destroys all data in the database while preserving the file.
+
+**Signature:** `EmptyDB(db string) (msg string, status bool)` 
 
 ```
 Example 1: (ignore return)
@@ -121,9 +338,13 @@ Return:
 
 ```
 
-**AddField() function take in ((key)string, (Value) string, db string) and add to database.**
+### CRUD Operations
 
->function: AddField()
+#### AddField
+
+Adds a new record to the database with auto-incrementing ID.
+
+**Signature:** `AddField(key string, data string, db string) bool`
 
 ```
 Example 1: (ignore return)
@@ -140,9 +361,11 @@ Return:
 
 ```
 
-**CountSize() function will return number of rows in the gojsondb.db**
+#### CountSize
 
->function: CountSize(db string)
+Returns the total number of records in the database.
+
+**Signature:** `CountSize(db string) int`
 
 ````
 Example (capture return):
@@ -153,9 +376,13 @@ Result:
 	44
 ````
 
-**FirstField func returns the first entry of gojsondb.db in all formats \[ raw | json | id | key | value ] specify format required**
+#### FirstField
 
->function: FirstField(db string)
+Retrieves the first record in the database.
+
+**Signature:** `FirstField(format string, db string) string`
+
+**Formats:** `raw` | `json` | `id` | `key` | `value`
 
 ```
 Example 1: (true | failed)
@@ -179,9 +406,13 @@ Result:
 }
 ```
 
-**LastField() func returns the last entry in multi-format \[ raw | json | id | key | value ]**
+#### LastField
 
->function: LastField(db string)
+Retrieves the last record in the database.
+
+**Signature:** `LastField(format string, db string) string`
+
+**Formats:** `raw` | `json` | `id` | `key` | `value`
 
 ```
 Example 1: (true | failed)
@@ -219,8 +450,13 @@ Result:
 }
 ```
 
-**SelectByID func returns an entry string for a specific id in all formats \[ raw | json | id | key | value ]**
->function: SelectByID(db string)
+#### SelectByID
+
+Retrieves a specific record by its ID.
+
+**Signature:** `SelectByID(id int, format string, db string) string`
+
+**Formats:** `raw` | `json` | `id` | `key` | `value`
 
 ```
 Example 1: (true)
@@ -249,8 +485,11 @@ Result:
 }
 ```
 
-**UniqueID function returns an int for the last used UniqueID**
->function: UniqueID(db string)
+#### UniqueID
+
+Returns the last used ID (useful for auto-increment logic).
+
+**Signature:** `UniqueID(db string) int`
 
 ```
 Example: (always true)
@@ -262,8 +501,11 @@ Result:
 ```
 
 
-**FirstXFields returns last X number of entries from db in byte[] format**
->function: FirstXFields(db string)
+#### FirstXFields
+
+Retrieves the first X records from the database.
+
+**Signature:** `FirstXFields(count int, format string, db string) (string, []byte)`
 
 ```
 Example:
@@ -295,8 +537,11 @@ Result:
 	id: 2, key: New string Entry 0, data: string of data representing a the value
 ```
 
-**LastXFields returns last X number of entries from db in values byte[] format**
->function: LastXFields(db string)
+#### LastXFields
+
+Retrieves the last X records from the database.
+
+**Signature:** `LastXFields(count int, format string, db string) (string, []byte)`
 
 ```
 Example 1: (always true)
@@ -328,8 +573,11 @@ Result:
 	id: 52, key: New string Entry 50, data: string of data representing a the value
 ```
 
-**RemoveField function takes an unique field id as an input and remove the matching field entry**
->function: RemoveField(db string)
+#### RemoveField
+
+Deletes a specific record by ID.
+
+**Signature:** `RemoveField(id int, db string) (string, bool)`
 
 ```
 Example 1: (true | false)
@@ -343,8 +591,11 @@ Result:
 	Database tardigrade.db is empty! false
 ```
 
-**ModifyField function takes ID, Key, Value and update row = ID with new information provided**
-> ModifyField(2, "Updated key", "Updated data set with new inforation", "db_name")
+#### ModifyField
+
+Updates an existing record with new key and data values.
+
+**Signature:** `ModifyField(id int, key string, value string, db string) (msg string, status bool)`
 
 ```
 Example 1: (true)
@@ -364,8 +615,13 @@ Result:
 	Record 100 is empty! false
 
 ```
-**SelectSearch function takes in a single or multiple words(comma, or space separated) and format type, Returns true values in all formats**
->SelectSearch("patern1,pattern2","json", "db_name")
+#### SelectSearch
+
+Searches for records matching all provided keywords (AND logic).
+
+**Signature:** `SelectSearch(search string, format string, db string) (string, []byte)`
+
+**Search:** Comma or space-separated keywords (case-insensitive)
 ```
 Example:
 	package main
@@ -429,7 +685,23 @@ Result:
 
 ```
 
-Additional couple of informational functions
+### Utility Functions
+
+#### Serialization & Encoding
+
+- `MyMarshal(t interface{}) ([]byte, error)` - JSON marshal with HTML escape disabled
+- `MyIndent(v interface{}, prefix, indent string) ([]byte, error)` - Pretty-print JSON
+- `MyEncode(b []byte) string` - Base64 encoding
+- `MyDecode(s string) []byte` - Base64 decoding
+
+#### Encryption (AES-CFB)
+
+- `MyEncrypt(text, password string) (string, error)` - Encrypt text with password
+- `MyDecrypt(text, password string) (string, error)` - Decrypt text with password
+
+**Note:** Password must be 16, 24, or 32 bytes for AES compatibility.
+
+#### Version Information
 ```
 Example:
 	package main
@@ -453,7 +725,33 @@ Result:
 ```
 
 
-RELEASE NOTE:
+## Performance Considerations
+
+- **Optimal for:** < 100,000 records, < 100 MB file size
+- **Search:** O(n) linear scan (no indexing)
+- **Updates/Deletes:** Full file rewrite operation
+- **Concurrency:** Single writer recommended
+
+For detailed performance characteristics, see [DESIGN.md](DESIGN.md).
+
+## Use Cases
+
+✅ **Ideal For:**
+- Configuration storage
+- Session management
+- Application caching
+- Logging and audit trails
+- Prototyping and development
+- CLI tools and utilities
+- Embedded systems
+
+❌ **Not Recommended For:**
+- High-concurrency applications
+- Large datasets (>1M records)
+- Real-time analytics
+- Applications requiring ACID transactions
+
+## Release Notes
 
 ```
 ** release 0.0.1 - Initial version
@@ -468,11 +766,34 @@ RELEASE NOTE:
 ** release 0.2.1 - Minor bug fix inntroduced in previous version
 ** release 0.2.3 - Working Progress enabling data encryption
 ** release 0.2.5 - Modified functions to include database name so an app can have more than 1 db
+** release 0.3.0 - Added flexible field support for variable schema records
 ```
 
-OUTSTANDING:
-```
-** Write and share additional functions
+## Roadmap
+### Planned Features
+
+```go
+// Encrypted field operations (coming soon)
 func (*Tardigrade).AddCryptField(key string, data string, db string) bool
 func (*Tardigrade).SelectByIDdecrypt(id int, f string, db string) string
 ```
+
+## Contributing
+
+Contributions are welcome! Please ensure:
+- Code follows Go conventions and best practices
+- All functions include proper error handling
+- Documentation is updated for new features
+- Examples are provided
+
+## License
+
+See [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues, questions, or contributions, please visit the [GitHub repository](https://github.com/gcclinux/tardigrade-mod).
+
+---
+
+**Made with ❤️ for the Go community**

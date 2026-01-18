@@ -1,6 +1,7 @@
 package tardigrade
 
 // Built Sat 4 Mar 12:32:07 GMT 2023
+// Version 0.3.0 - Sun Jan 18 09:38:18 PM GMT 2026
 
 import (
 	"bytes"

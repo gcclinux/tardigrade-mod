@@ -1,6 +1,7 @@
 package tardigrade
 
 // Updated Sat  4 Mar 18:56:11 GMT 2023
+// Version 0.3.0 - Sun Jan 18 09:38:18 PM GMT 2026
 
 import (
 	"bufio"
